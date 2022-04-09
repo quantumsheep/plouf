@@ -1,7 +1,11 @@
 package plouf
 
 import (
+	"net/http"
+
+	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 type Worker struct {
@@ -21,6 +25,9 @@ func NewWorker(mainModule IModule) (*Worker, error) {
 
 	e := echo.New()
 	e.HideBanner = true
+	e.Validator = NewDTOValidator()
+
+	e.Use(middleware.Recover())
 
 	if err := mainModule.InitControllersRoutes(mainModule, e); err != nil {
 		return nil, err
@@ -34,4 +41,20 @@ func NewWorker(mainModule IModule) (*Worker, error) {
 
 func (w *Worker) Start(address string) error {
 	return w.e.Start(address)
+}
+
+type DTOValidator struct {
+	validator *validator.Validate
+}
+
+func (cv *DTOValidator) Validate(i interface{}) error {
+	if err := cv.validator.Struct(i); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+
+	return nil
+}
+
+func NewDTOValidator() *DTOValidator {
+	return &DTOValidator{validator: validator.New()}
 }
