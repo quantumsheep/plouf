@@ -20,12 +20,12 @@ func (s Service) Init(self IInjectable) error {
 	}
 
 	if s.ShouldLogInjection(self) {
-		logrus.Debugf("Initializing service %s", reflectTypeName(self))
+		logrus.Debugf("Initializing service %s", ReflectTypeName(self))
 	}
 
 	return nil
 }
 
 func (s Service) ShouldLogInjection(self IInjectable) bool {
-	return reflectValue(self).Type() != reflect.TypeOf(Service{})
+	return ReflectValue(self).Type() != reflect.TypeOf(Service{})
 }

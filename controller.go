@@ -23,12 +23,12 @@ func (c Controller) Init(self IInjectable) error {
 	}
 
 	if c.ShouldLogInjection(self) {
-		logrus.Debugf("Initializing controller %s", reflectTypeName(self))
+		logrus.Debugf("Initializing controller %s", ReflectTypeName(self))
 	}
 
 	return nil
 }
 
 func (c Controller) ShouldLogInjection(self IInjectable) bool {
-	return reflectValue(self).Type() != reflect.TypeOf(Controller{})
+	return ReflectValue(self).Type() != reflect.TypeOf(Controller{})
 }

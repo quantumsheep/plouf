@@ -2,7 +2,7 @@ package plouf
 
 import "reflect"
 
-func reflectTypeName(i interface{}) string {
+func ReflectTypeName(i interface{}) string {
 	typ := reflect.TypeOf(i)
 
 	if typ.Kind() == reflect.Ptr {
@@ -12,7 +12,7 @@ func reflectTypeName(i interface{}) string {
 	return typ.Name()
 }
 
-func reflectValue(i interface{}) reflect.Value {
+func ReflectValue(i interface{}) reflect.Value {
 	value := reflect.ValueOf(i)
 
 	if value.Kind() == reflect.Ptr {

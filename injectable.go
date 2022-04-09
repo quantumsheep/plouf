@@ -15,7 +15,7 @@ type IInjectable interface {
 type Injectable struct{}
 
 func (i *Injectable) Init(self IInjectable) error {
-	value := reflectValue(self)
+	value := ReflectValue(self)
 	for i := 0; i < value.NumField(); i++ {
 		field := value.Field(i)
 

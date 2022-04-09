@@ -23,18 +23,18 @@ func (m Module) Init(self IInjectable) error {
 	}
 
 	if m.ShouldLogInjection(self) {
-		logrus.Debugf("Initializing module %s", reflectTypeName(self))
+		logrus.Debugf("Initializing module %s", ReflectTypeName(self))
 	}
 
 	return nil
 }
 
 func (m Module) ShouldLogInjection(self IInjectable) bool {
-	return reflectValue(self).Type() != reflect.TypeOf(Module{})
+	return ReflectValue(self).Type() != reflect.TypeOf(Module{})
 }
 
 func (m Module) InitControllersRoutes(self IInjectable, e *echo.Echo) error {
-	value := reflectValue(self)
+	value := ReflectValue(self)
 	for i := 0; i < value.NumField(); i++ {
 		field := value.Field(i)
 
@@ -44,7 +44,7 @@ func (m Module) InitControllersRoutes(self IInjectable, e *echo.Echo) error {
 
 		if _, ok := field.Interface().(IInjectable); ok {
 			if controller, ok := field.Interface().(IController); ok {
-				logrus.Debugf("Initializing routes for %s", reflectTypeName(controller))
+				logrus.Debugf("Initializing routes for %s", ReflectTypeName(controller))
 				controller.InitRoutes(e)
 			}
 
