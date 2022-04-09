@@ -30,14 +30,14 @@ func (r *Repository[T]) Init(self plouf.IInjectable) error {
 	return nil
 }
 
-func (r *Repository[T]) Find(conds ...interface{}) ([]T, error) {
-	var values []T
+func (r *Repository[T]) Find(conds ...interface{}) ([]*T, error) {
+	var values []*T
 	tx := r.Connection.Database.Find(&values, conds...)
 	return values, tx.Error
 }
 
-func (r *Repository[T]) FindOne(conds ...interface{}) (T, error) {
-	var value T
+func (r *Repository[T]) FindOne(conds ...interface{}) (*T, error) {
+	var value *T
 	tx := r.Connection.Database.First(&value, conds...)
 	return value, tx.Error
 }
