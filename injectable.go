@@ -108,7 +108,9 @@ func Inject(injectable IInjectable) error {
 
 		// Inject new value dependencies
 		child := value.Interface().(IInjectable)
-		Inject(child)
+		if err := Inject(child); err != nil {
+			return err
+		}
 	}
 
 	return nil
