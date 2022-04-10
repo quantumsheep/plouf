@@ -8,6 +8,21 @@ import (
 	"gorm.io/gorm"
 )
 
+type DatabaseDriverInitializer func(driver string, config *ConfigService) (gorm.Dialector, error)
+
+var DatabaseDrivers = map[string]DatabaseDriverInitializer{
+	"sqlite": DatabaseDriverSQLite,
+}
+
+func DatabaseDriverSQLite(driver string, config *ConfigService) (gorm.Dialector, error) {
+	path := config.Get("database.path")
+	if path == "" {
+		return nil, fmt.Errorf(`"database.path" is not configured`)
+	}
+
+	return sqlite.Open(path), nil
+}
+
 type DatabaseConnection struct {
 	plouf.Service
 
@@ -20,26 +35,24 @@ func (d *DatabaseConnection) Init(self plouf.IInjectable) error {
 	var dialector gorm.Dialector
 
 	driver := d.ConfigService.Get("database.driver")
-	switch driver {
-	case "":
+	if driver == "" {
 		return fmt.Errorf(`"database.driver" is not configured`)
-	case "sqlite":
-		path := d.ConfigService.Get("database.path")
-		if path == "" {
-			return fmt.Errorf(`"database.path" is not configured`)
-		}
+	}
 
-		dialector = sqlite.Open(path)
-	default:
+	initializer, ok := DatabaseDrivers[driver]
+	if !ok {
 		return fmt.Errorf(`configured "database.driver" ("%s") is not supported`, driver)
 	}
 
-	db, err := gorm.Open(dialector, &gorm.Config{})
+	dialector, err := initializer(driver, d.ConfigService)
 	if err != nil {
 		return err
 	}
 
-	d.Database = db
+	d.Database, err = gorm.Open(dialector, &gorm.Config{})
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
